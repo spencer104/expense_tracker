@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Expense Graphs</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            text-align: center;
+        }
+        #navbar {
+            display: flex;
+            background-color: #333;
+            top: 0;
+            z-index: 1000;
+            width: 100%;
+            position: sticky; /* Make navbar sticky */
+        }
+        #navbar a {
+            color: #f2f2f2;
+            padding: 14px 16px;
+            text-decoration: none;
+            font-size: 17px;
+            text-align: center;
+        }
+        #navbar a:hover {
+            background-color: #ddd;
+            color: black;
+        }
+        #navbar a.active {
+            background-color: #0491aa;
+            color: white;
+        }
+        #navbar a.right {
+            margin-left: auto;
+        }
+        .sticky {
+            position: fixed;
+            width: 100%;
+            top: 0;
+            left: 0;
+        }
+        #charts-container {
+            display: flex;
+            justify-content: space-around;
+            align-items: flex-start;
+            margin-left: 25vh;
+            margin-right: 25vh;
+        }
+        #pie-chart-container {
+            width: 40%; /* Larger width for pie chart */
+        }
+        #bar-chart-container {
+            width: 40%; /* Smaller width for bar chart */
+        }
+
+        #myPieChart{
+            width: 100px;
+            height: 100px; /* Set a fixed height for charts */
+        }
+        #myBarChart{
+            width: 100%;
+            height: 70vh; /* Set a fixed height for charts */
+        }
+
+        /* Responsive styling for smaller screens */
+        @media (max-width: 900px) {
+            #charts-container {
+                flex-direction: column;
+                align-items: center;
+            }
+            #pie-chart-container, #bar-chart-container {
+                width: 90%;
+                margin-bottom: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="navbar">
+        <a href="/">Data</a>
+        <a href="/line">line</a>
+    </div>
+
+    <h1>Expense Graphs</h1>
+
+    <div id="charts-container">
+        <div id="pie-chart-container">
+            <canvas id="myPieChart"></canvas>
+        </div>
+        <div id="bar-chart-container">
+            <canvas id="myBarChart"></canvas>
+        </div>
+    </div>
+
+
+    <script>
+        var labels = JSON.parse('{{ labels | tojson }}');
+        var amounts = JSON.parse('{{ amounts | tojson }}');
+
+        // Pie Chart
+        var ctxPie = document.getElementById('myPieChart').getContext('2d');
+        var myPieChart = new Chart(ctxPie, {
+            type: 'pie',
+            data: {
+                labels: labels,
+                datasets: [{
+                    data: amounts,
+                    backgroundColor: [
+                        'rgba(255, 99, 132, 0.5)',
+                        'rgba(54, 162, 235, 0.5)',
+                        'rgba(255, 206, 86, 0.5)',
+                        'rgba(75, 192, 192, 0.5)',
+                        'rgba(153, 102, 255, 0.5)',
+                        'rgba(255, 159, 64, 0.5)'
+                    ]
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                legend: {
+                    display: false
+                },
+                layout: {
+                    padding: {
+                        left: 0,
+                        right: 0,
+                        top: 0,
+                        bottom: 0
+                    }
+                }
+            }
+        });
+
+        // Bar Chart
+        var ctxBar = document.getElementById('myBarChart').getContext('2d');
+        var myBarChart = new Chart(ctxBar, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Expense Amount',
+                    data: amounts,
+                    backgroundColor: [
+                        'rgba(255, 99, 132, 0.5)',
+                        'rgba(54, 162, 235, 0.5)',
+                        'rgba(255, 206, 86, 0.5)',
+                        'rgba(75, 192, 192, 0.5)',
+                        'rgba(153, 102, 255, 0.5)',
+                        'rgba(255, 159, 64, 0.5)'
+                    ]
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false, // Changed to false to respect the set height
+                scales: {
+                    yAxes: [{
+                        ticks: {
+                            beginAtZero: true
+                        }
+                    }]
+                },
+                legend: {
+                    display: false
+                },
+                layout: {
+                    padding: {
+                        left: 0,
+                        right: 0,
+                        top: 0,
+                        bottom: 0
+                    }
+                }
+            }
+        });
+ 
+
+    </script>
+</body>
+</html>

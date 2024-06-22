@@ -1,0 +1,197 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            text-align: center; /* Center all text within the body */
+        }
+        #navbar {
+            display: flex;
+            background-color: #333;
+            top: 0;
+            z-index: 1000;
+            width: 100%;
+            position: sticky; /* Make navbar sticky */
+        }
+        #navbar a {
+            color: #f2f2f2;
+            padding: 14px 16px;
+            text-decoration: none;
+            font-size: 17px;
+            text-align: center;
+        }
+        #navbar a:hover {
+            background-color: #ddd;
+            color: black;
+        }
+        #navbar a.active {
+            background-color: #0491aa;
+            color: white;
+        }
+        #navbar a.right {
+            margin-left: auto;
+        }
+        /* Additional style for sticky positioning */
+        .sticky {
+            position: fixed;
+            width: 100%;
+            top: 0;
+            left: 0;
+        }
+        table {
+            width: 80%; /* Reduce width to create space for side margins */
+            border-collapse: collapse;
+            margin-top: 20px;
+            margin-left: auto; /* Center the table */
+            margin-right: auto; /* Center the table */
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: center; /* Center table headers and data */
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        tr:hover {
+            background-color: #f5f5f5;
+        }
+        .button {
+            background-color: #e1ecf4;
+            border-radius: 3px;
+            border: 1px solid #7aa7c7;
+            box-shadow: rgba(255, 255, 255, .7) 0 1px 0 0 inset;
+            box-sizing: border-box;
+            color: #39739d;
+            cursor: pointer;
+            display: inline-block;
+            font-family: -apple-system,system-ui,"Segoe UI","Liberation Sans",sans-serif;
+            font-size: 13px;
+            font-weight: 400;
+            line-height: 1.15385;
+            margin: 0;
+            outline: none;
+            padding: 8px .8em;
+            position: relative;
+            text-align: center;
+            text-decoration: none;
+            user-select: none;
+            -webkit-user-select: none;
+            touch-action: manipulation;
+            vertical-align: baseline;
+            white-space: nowrap;
+        }
+        .button:hover,
+        .button:focus {
+            background-color: #b3d3ea;
+            color: #2c5777;
+        }
+        .button:focus {
+            box-shadow: 0 0 0 4px rgba(0, 149, 255, .15);
+        }
+        .button:active {
+            background-color: #a0c7e4;
+            box-shadow: none;
+            color: #2c5777;
+        }
+
+        input, select {
+        width: 30vh;
+        padding: 12px 20px;
+        margin: 8px 0;
+        display: inline-block;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        box-sizing: border-box;
+        }
+
+        input[type="date"] {
+            width: 30vh;
+            padding: 12px 20px;
+            margin: 8px 0;
+            display: inline-block;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+            appearance: none; /* Remove default arrow */
+            background-color: white; /* Set background color to match other inputs */
+            color: #555; /* Set text color to match other inputs */
+            font-family: Arial, sans-serif; /* Match font family with other inputs */
+}
+
+
+    </style>
+    <title>Expense Tracker</title>
+</head>
+<body>
+    <div id="navbar">
+        <a href="/graphs">Graphs</a>
+        <a href="/line">line</a>
+    </div>
+
+    <h1>Expense Tracker</h1>
+    <form action="/add" method="post">
+        <input type="text" name="name" placeholder="Expense Name" required>
+        <input type="number" step="0.01" name="amount" placeholder="Amount" required>
+        <input type="text" name="cost_type" placeholder="Cost Type" required>
+        <input type="date" name="date" required>
+        <button type="submit" class="button">Add Expense</button>
+    </form>
+    
+    <h2>Expenses</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Amount</th>
+                <th>Cost Type</th>
+                <th>Date</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for expense in expenses %}
+            <tr>
+                <td>{{ expense.name }}</td>
+                <td>${{ expense.amount }}</td>
+                <td>{{ expense.cost_type }}</td>
+                <td>{{ expense.date.strftime('%m-%d-%y') }}</td>
+                <td>
+                    <form action="/delete/{{ expense.id }}" method="post" style="display:inline;">
+                        <button type="submit" class="button">Delete</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    
+    <h3>Total Expense: ${{ total_expense }}</h3>
+    
+    <form action="/clear" method="post">
+        <button type="submit" class="button">Clear All Expenses</button>
+    </form>
+
+    <!-- navbar -->
+    <script>
+        window.onscroll = function() {myFunction()};
+        
+        var navbar = document.getElementById("navbar");
+        var sticky = navbar.offsetTop;
+        
+        function myFunction() {
+          if (window.pageYOffset >= sticky) {
+            navbar.classList.add("sticky");
+          } else {
+            navbar.classList.remove("sticky");
+          }
+        }
+    </script>
+</body>
+</html>
