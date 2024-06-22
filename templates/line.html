@@ -17,7 +17,7 @@
             top: 0;
             z-index: 1000;
             width: 100%;
-            position: sticky; /* Make navbar sticky */
+            position: sticky;
         }
         #navbar a {
             color: #f2f2f2;
@@ -37,13 +37,7 @@
         #navbar a.right {
             margin-left: auto;
         }
-        .sticky {
-            position: fixed;
-            width: 100%;
-            top: 0;
-            left: 0;
-        }
-        #myLineChart{ 
+        #myLineChart {
             margin: 20vh;
         }
 
@@ -69,73 +63,71 @@
     <h1>Expense Graphs</h1>
 
     <!-- Dropdown menu for selecting the time unit -->
-    <label for="time-unit">Select time unit:</label>
-    <select id="time-unit">
-        <option value="day">Day</option>
-        <option value="week">Week</option>
-        <option value="month">Month</option>
-    </select>
+    <form id="time-unit-form" action="/line" method="get">
+        <label for="time-unit">Select time unit:</label>
+        <select id="time-unit" name="time_unit" onchange="this.form.submit()">
+            <option value="day" {% if request.args.get('time_unit') == 'day' %}selected{% endif %}>Day</option>
+            <option value="week" {% if request.args.get('time_unit') == 'week' %}selected{% endif %}>Week</option>
+            <option value="month" {% if request.args.get('time_unit') == 'month' %}selected{% endif %}>Month</option>
+        </select>
+    </form>
 
     <div id="json-data-container"></div>
 
     <canvas id="myLineChart"></canvas>
 
-
     <script>
-    var total_expenses_labels = JSON.parse('{{total_expenses_labels | tojson }}');
-    var total_expenses_amounts = JSON.parse('{{ total_expenses_amounts | tojson }}');
+        var total_expenses_labels = JSON.parse('{{ total_expenses_labels | tojson }}');
+        var total_expenses_amounts = JSON.parse('{{ total_expenses_amounts | tojson }}');
 
-    // Line Chart
-    var ctxLine = document.getElementById('myLineChart').getContext('2d');
-    var myLineChart = new Chart(ctxLine, {
-        type: 'line',
-        data: {
-            labels: total_expenses_labels, // Assuming 'labels' represents dates or time periods
-            datasets: [{
-                label: 'Expense Over Time',
-                data: total_expenses_amounts, // Corrected variable name
-                borderColor: 'rgba(75, 192, 192, 1)',
-                backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                borderWidth: 1
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: true,
-            legend: {
-                display: true,
-                position: 'bottom'
-            },
-            scales: {
-                xAxes: [{
-                    type: 'time',
-                    time: {
-                        unit: 'month' // Default time unit
-                    },
-                    scaleLabel: {
-                        display: true,
-                        labelString: 'Date'
-                    }
-                }],
-                yAxes: [{
-                    ticks: {
-                        beginAtZero: true  // Start the y-axis from 0
-                    },
-                    scaleLabel: {
-                        display: true,
-                        labelString: 'Expense'
-                    }
+        // Line Chart
+        var ctxLine = document.getElementById('myLineChart').getContext('2d');
+        var myLineChart = new Chart(ctxLine, {
+            type: 'line',
+            data: {
+                labels: total_expenses_labels,
+                datasets: [{
+                    label: 'Expense Over Time',
+                    data: total_expenses_amounts,
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    borderWidth: 1
                 }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                legend: {
+                    display: true,
+                    position: 'bottom'
+                },
+                scales: {
+                    xAxes: [{
+                        type: 'time',
+                        time: {
+                            unit: '{{ request.args.get("time_unit", "month") }}' // Set the time unit based on the selected value
+                        },
+                        scaleLabel: {
+                            display: true,
+                            labelString: 'Date'
+                        }
+                    }],
+                    y: {
+                        beginAtZero: true,
+                        
+                        scaleLabel: {
+                            display: true,
+                            labelString: 'Expense'
+                        }
+                    }
+                }
             }
-        }
-    });
+        });
 
-    // Event listener for the dropdown menu
-    document.getElementById('time-unit').addEventListener('change', function() {
-        var unit = this.value;
-        myLineChart.options.scales.xAxes[0].time.unit = unit;
-        myLineChart.update();
-    });
+        // Event listener for the dropdown menu
+        document.getElementById('time-unit').addEventListener('change', function() {
+            document.getElementById('time-unit-form').submit();
+        });
     </script>
 </body>
 </html>

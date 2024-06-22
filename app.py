@@ -4,6 +4,7 @@ from datetime import datetime
 from flask import jsonify
 from sqlalchemy import func
 from datetime import date, timedelta
+from dateutil.relativedelta import relativedelta
 
 
 app = Flask(__name__)
@@ -90,7 +91,6 @@ def graphs():
 
 @app.route('/line')
 def line():
-    # Retrieve the selected time unit from the query string parameter
     time_unit = request.args.get('time_unit', 'day')  # Default to 'day' if not provided
 
     expenses = Expense.query.all()
@@ -99,26 +99,32 @@ def line():
     start_date = min(expense.date for expense in expenses).date()
     end_date = max(expense.date for expense in expenses).date()
     date_format = '%Y-%m-%d'
-    x = start_date - timedelta(days=1)
-    total_expenses_labels = [x.strftime(date_format)]
-    total_expenses_amounts = [0]
+    total_expenses_labels = []
+    total_expenses_amounts = []
 
     current_date = start_date
     cumulative_total = 0
+
     while current_date <= end_date:
-        total_amount = sum(expense.amount for expense in expenses if expense.date.date() == current_date)
+        if time_unit == 'day':
+            next_date = current_date + timedelta(days=1)
+        elif time_unit == 'week':
+            next_date = current_date + timedelta(weeks=1)
+        elif time_unit == 'month':
+            next_date = current_date + relativedelta(months=1)
+        else:
+            next_date = current_date + timedelta(days=1)  # Fallback to day
+
+        total_amount = sum(expense.amount for expense in expenses if current_date <= expense.date.date() < next_date)
         cumulative_total += total_amount
+        
         total_expenses_labels.append(current_date.strftime(date_format))
         total_expenses_amounts.append(cumulative_total)
 
-        if time_unit == 'day':
-            current_date += timedelta(days=1)
-        elif time_unit == 'week':
-            current_date += timedelta(weeks=1)
-        elif time_unit == 'month':
-            current_date = current_date.replace(day=1) + relativedelta(months=1)
+        current_date = next_date
 
     return render_template('line.html', total_expenses_labels=total_expenses_labels, total_expenses_amounts=total_expenses_amounts)
+
 
 if __name__ == '__main__':
     with app.app_context():
