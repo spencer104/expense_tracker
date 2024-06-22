@@ -1,10 +1,9 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Segmented Bar Chart</title>
+    <title>Stacked Bar Chart</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         body {
@@ -61,7 +60,7 @@
         <a href="/bar_chart" class="active">Bar Chart</a>
     </div>
 
-    <h1>Segmented Bar Chart</h1>
+    <h1>Stacked Bar Chart</h1>
 
     <div id="chart-container">
         <canvas id="myBarChart"></canvas>
@@ -70,6 +69,19 @@
     <script>
         var labels = JSON.parse('{{ labels | tojson | safe }}');
         var datasets = JSON.parse('{{ datasets | tojson | safe }}');
+
+        var colors = [
+            'rgba(255, 99, 132, 0.5)',
+            'rgba(54, 162, 235, 0.5)',
+            'rgba(255, 206, 86, 0.5)',
+            'rgba(75, 192, 192, 0.5)',
+            'rgba(153, 102, 255, 0.5)',
+            'rgba(255, 159, 64, 0.5)'
+        ];
+
+        datasets.forEach(function(dataset, index) {
+            dataset.backgroundColor = colors[index % colors.length];
+        });
 
         var ctxBar = document.getElementById('myBarChart').getContext('2d');
         var myBarChart = new Chart(ctxBar, {
@@ -82,13 +94,18 @@
                 responsive: true,
                 maintainAspectRatio: false,
                 scales: {
+                    x: {
+                        stacked: true,
+                    },
                     y: {
                         beginAtZero: true,
-                        
+                        stacked: true,
                     }
                 },
-                legend: {
-                    display: true
+                plugins: {
+                    legend: {
+                        display: true
+                    }
                 }
             }
         });

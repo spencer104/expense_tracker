@@ -92,6 +92,7 @@
         <div id="pie-chart-container">
             <canvas id="myPieChart"></canvas>
         </div>
+        
         <div id="bar-chart-container">
             <canvas id="myBarChart"></canvas>
         </div>
@@ -133,6 +134,16 @@
                         top: 0,
                         bottom: 0
                     }
+                },
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Total Expenses Based on Category Pie Chart', // change title 
+                        padding: {
+                            top: 10,
+                            bottom: 30
+                        }
+                    }
                 }
             }
         });
@@ -166,9 +177,6 @@
                         }
                     }]
                 },
-                legend: {
-                    display: false
-                },
                 layout: {
                     padding: {
                         left: 0,
@@ -176,7 +184,21 @@
                         top: 0,
                         bottom: 0
                     }
-                }
+                },
+                plugins: {
+                    legend: {
+                        display: false
+                    },                    
+                    title: {
+                        display: true,
+                        text: 'Total Expenses Based on Category Bar Graph', //change chart title
+                        padding: {
+                            top: 10,
+                            bottom: 30
+                        }
+                    }
+        }
+
             }
         });
  

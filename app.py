@@ -128,7 +128,6 @@ def line():
 @app.route('/bar_chart')
 def bar_chart():
     expenses = Expense.query.all()
-    expense_names = [expense.name for expense in expenses]
     cost_types = list(set(expense.cost_type for expense in expenses))
 
     expense_data = {}
