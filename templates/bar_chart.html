@@ -1,0 +1,97 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Segmented Bar Chart</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            text-align: center;
+        }
+        #navbar {
+            display: flex;
+            background-color: #333;
+            top: 0;
+            z-index: 1000;
+            width: 100%;
+            position: sticky;
+        }
+        #navbar a {
+            color: #f2f2f2;
+            padding: 14px 16px;
+            text-decoration: none;
+            font-size: 17px;
+            text-align: center;
+        }
+        #navbar a:hover {
+            background-color: #ddd;
+            color: black;
+        }
+        #navbar a.active {
+            background-color: #0491aa;
+            color: white;
+        }
+        #navbar a.right {
+            margin-left: auto;
+        }
+        .sticky {
+            position: fixed;
+            width: 100%;
+            top: 0;
+            left: 0;
+        }
+        #chart-container {
+            margin: 20px;
+        }
+        #myBarChart {
+            width: 100%;
+            height: 70vh;
+        }
+    </style>
+</head>
+<body>
+    <div id="navbar">
+        <a href="/">Data</a>
+        <a href="/line">Line</a>
+        <a href="/graphs">Graphs</a>
+        <a href="/bar_chart" class="active">Bar Chart</a>
+    </div>
+
+    <h1>Segmented Bar Chart</h1>
+
+    <div id="chart-container">
+        <canvas id="myBarChart"></canvas>
+    </div>
+
+    <script>
+        var labels = JSON.parse('{{ labels | tojson | safe }}');
+        var datasets = JSON.parse('{{ datasets | tojson | safe }}');
+
+        var ctxBar = document.getElementById('myBarChart').getContext('2d');
+        var myBarChart = new Chart(ctxBar, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: datasets
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        
+                    }
+                },
+                legend: {
+                    display: true
+                }
+            }
+        });
+    </script>
+</body>
+</html>

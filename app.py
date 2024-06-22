@@ -125,6 +125,29 @@ def line():
 
     return render_template('line.html', total_expenses_labels=total_expenses_labels, total_expenses_amounts=total_expenses_amounts)
 
+@app.route('/bar_chart')
+def bar_chart():
+    expenses = Expense.query.all()
+    expense_names = [expense.name for expense in expenses]
+    cost_types = list(set(expense.cost_type for expense in expenses))
+
+    expense_data = {}
+    for expense in expenses:
+        if expense.name not in expense_data:
+            expense_data[expense.name] = {cost_type: 0 for cost_type in cost_types}
+        expense_data[expense.name][expense.cost_type] += expense.amount
+
+    labels = list(expense_data.keys())
+    datasets = []
+    for cost_type in cost_types:
+        dataset = {
+            'label': cost_type,
+            'data': [expense_data[label][cost_type] for label in labels],
+            'backgroundColor': 'rgba(54, 162, 235, 0.5)'
+        }
+        datasets.append(dataset)
+
+    return render_template('bar_chart.html', labels=labels, datasets=datasets)
 
 if __name__ == '__main__':
     with app.app_context():
