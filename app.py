@@ -1,11 +1,8 @@
 from flask import Flask, render_template, request, redirect
 from flask_sqlalchemy import SQLAlchemy
-from datetime import datetime
-from flask import jsonify
+from datetime import datetime, timedelta
 from sqlalchemy import func
-from datetime import date, timedelta
 from dateutil.relativedelta import relativedelta
-
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///expenseDB.db'
@@ -18,7 +15,7 @@ class Expense(db.Model):
     name = db.Column(db.String(100), nullable=False)
     amount = db.Column(db.Float, nullable=False)
     date = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
-    cost_type =  db.Column(db.String(100), nullable=False)
+    cost_type = db.Column(db.String(100), nullable=False)
 
     def __repr__(self):
         return f'<Expense {self.name}>'
@@ -33,15 +30,14 @@ def home():
     total_expense = calculate_total_expense()
     return render_template('index.html', expenses=expenses, total_expense=total_expense)
 
-
-
 @app.route('/add', methods=['POST'])
 def add_expense():
-    name = request.form['name']
-    amount = request.form['amount']
-    cost_type = request.form['cost_type']
-    date = datetime.strptime(request.form['date'], '%Y-%m-%d')
-    new_expense = Expense(name=name, amount=float(amount), date=date, cost_type = cost_type)
+    name = request.form['name'].strip().lower()
+    amount = request.form['amount'].strip()
+    cost_type = request.form['cost_type'].strip().lower().capitalize()
+    date = datetime.strptime(request.form['date'].strip(), '%Y-%m-%d')
+
+    new_expense = Expense(name=name, amount=float(amount), date=date, cost_type=cost_type)
 
     try:
         db.session.add(new_expense)
@@ -69,7 +65,6 @@ def clear_database():
         return redirect('/')
     except Exception as e:
         return f"An error occurred while clearing the database: {e}"
-    
 
 @app.route('/graphs')
 def graphs():
@@ -86,7 +81,6 @@ def graphs():
     labels = list(cost_type_totals.keys())
     amounts = list(cost_type_totals.values())
 
-  
     return render_template('graphs.html', labels=labels, amounts=amounts)
 
 @app.route('/line')
@@ -94,6 +88,9 @@ def line():
     time_unit = request.args.get('time_unit', 'day')  # Default to 'day' if not provided
 
     expenses = Expense.query.all()
+    
+    if not expenses:
+        return render_template('line.html', total_expenses_labels=[], total_expenses_amounts=[])
 
     # Find the earliest and latest dates in the expenses
     start_date = min(expense.date for expense in expenses).date()
