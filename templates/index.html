@@ -1,5 +1,3 @@
-
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -50,12 +48,14 @@
             margin-top: 20px;
             margin-left: auto; /* Center the table */
             margin-right: auto; /* Center the table */
+            overflow-x: scroll;
         }
         th, td {
             border: 1px solid #ddd;
             padding: 8px;
             text-align: center; /* Center table headers and data */
         }
+
         th {
             background-color: #f2f2f2;
         }
@@ -119,6 +119,7 @@
 
         }
 
+
         /* Additional CSS for stacking inputs in a column after 1400px */
         @media screen and (max-width: 1400px) {
             form {
@@ -131,6 +132,16 @@
                 width: 80%;
                 margin: 8px 0; /* Adjust margin to add space between inputs */
             }
+        }
+
+        @media screen and (max-width: 500px) {
+            table{
+                width: 100%;
+            }
+            
+        .date-column {
+            width: 75px; /* Set the fixed width for the date column */
+        }
         }
 
     </style>
@@ -159,7 +170,7 @@
                 <th>Name</th>
                 <th>Amount</th>
                 <th>Cost Type</th>
-                <th>Date</th>
+                <th class="date-column">Date</th>
                 <th>Action</th>
             </tr>
         </thead>
@@ -169,7 +180,7 @@
                 <td>{{ expense.name }}</td>
                 <td>${{ expense.amount }}</td>
                 <td>{{ expense.cost_type }}</td>
-                <td>{{ expense.date.strftime('%m-%d-%y') }}</td>
+                <td class="date-column">{{ expense.date.strftime('%m-%d-%y') }}</td>
                 <td>
                     <form action="/delete/{{ expense.id }}" method="post" style="display:inline;">
                         <button type="submit" class="button">Delete</button>
